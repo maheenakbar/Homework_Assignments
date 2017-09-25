@@ -1,0 +1,920 @@
+#Problem 2
+key = 'EXALT'
+
+ciphertext_upper = 'MKASHPHMKTSXKUSRNOMLHVBLTOIGEEOMUMWRLTLGEVXVDTKXBABTSHPHJFLWXHZMQHEAIHRASZYARVJSLGHDRLOKRWPIILYHVBIQAOKCEEOEDTRGCEOWXALXENZMLLRDIYBXWSPIEWSZRLNZKXRIXTTMADWXHZUFLXEOWXEQHQHLMQHEKSNHQISOTTMLDHXPPKJHGQLJKSXRADZHVOMHELISUXEOWXTDMKTPWKUIBNHBXKEPHTGCBIILZPFUEPSVGSEMKTSXIAEZTXBHGPBTSXHRSOOAXRHHLNEHEWYYEDAESIAHLEPOMHELMYQRBLLOIUCZOXYSUXXBWXXXRKEWPMWLLUELQROBWTMLSEKEWEIGAXLWLEQHCLZHVVXFLPWEQHZACIIWIAPCHZLHBDHBXKTLLTLLHHZHLBVVEKDWHXVEKDWHXVSCPPZWISOHLMWDRACZTXVXEESHFEMQWLLJRRAOQOMVMQOCLXKIQUYGIOALUYWSQEKDZGKRMKGQTMUPVBFMRRXNUTMIVXOATZLWMKTZMLHWFDPHJWLBHTEPWLBHTEPDWXLWMLHTBOAEIISOMLGCPMIEDKSXRACLEPHHFTLGHPEKYWBXWPBRZNRGHLOCLSSIKEOHYWSCIEYMUWQOYHRHWFDPTRGXEEYHRDRLTSXVQSDOTGKXTPTLBVVJLREAIKSYBTMFHHOOZFWEEQHCHSPWZEWEEUWMAYMVLIPLZMWRJQHPLIZEODCHFHWEESTHZLLLPKSRQPDPOSWIATZVPRXEEDDMWGEEYLHLRFNRKSRQPAWEAHVBOYMLHWXMPYPRSOAYWMQHBEOHRWLBSLFISEPSLZIWLBBPLXUSLMDPIUIXLWHRWLBLPYXKEKDDBHHKLIYZMQJLREAIVITECXXKILNWRSQIPTZAEYITIYWSZWAEPIWHXOOFGHZMKDZPWOSLKTGKRZBRSBWJEODPGEQHJELWSZWYEJHRGWIOABRJHLWYMSWLBRTOIUXEIDASEFFTHTWDZBRJPIOPQOOHLRFYIETRGLFSYTQHAXSMTKJMKSEAIEEDGTGWHWEAOEMYIAIYMLHRBIRAFRYOHZHHRJQHPAMOPCOCMMPILUEHJPMKDLGHSILPWXGRRPIOXVHHQHPFZHVVRPLTHGQAMEIQSQOYECEIZAFLIPSPTZYXKIJWPKIUMZHMNXDPPOMXGDYPEEAIBRBVPKLDHXNJTHYIKTFKIVSODTWEQCQHTGKXRBXAXGWIAYZNGRYIDEXPOAEAETFD'
+ciphertext = ciphertext_upper.lower()
+
+english_frequency_dict = { "a": .08167, "b": .01492, "c": .02782, "d": .04253, "e": .12702, "f": .02228,
+"g": .02015, "h": .06094, "i": .06996, "j": .00153, "k": .00772, "l": .04025,
+"m": .02406, "n": .06749, "o": .07507, "p": .01929, "q": .00095, "r": .05987,
+"s": .06327, "t": .09056, "u": .02758, "v": .00978, "w": .02360, "x": .00150,
+"y": .01974, "z": .00074 }
+
+#this maps each letter in the alphabet to how much plaintext should be shifted over depending on the letters in the key
+vigenere_dict = { 'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 
+'h': 7, 'i': 8, 'j': 9, 'k': 10, 'l': 11, 'm': 12, 'n': 13, 'o': 14, 
+'p': 15, 'q': 16, 'r': 17, 's': 18, 't': 19, 'u': 20, 'v': 21, 'w': 22, 
+'x': 23, 'y': 24, 'z': 25 }
+
+vigenere_opp = {0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 
+7: 'h', 8: 'i', 9: 'j', 10: 'k', 11: 'l', 12: 'm', 13: 'n', 14: 'o', 15: 'p',
+16: 'q', 17: 'r', 18: 's', 19: 't', 20: 'u', 21: 'v', 22: 'w', 23: 'x', 24: 'y',
+25: 'z'  } 
+
+#takes dictionary as an input
+def variance(dict, size):
+	expected_mean = 1.0 / 26
+	sum = 0.0
+	for item in dict:
+		sum += (dict[item] - expected_mean) ** 2
+	var = (1 / size) * sum
+	return var
+
+def var_input(input):
+	input_length = len(input) * 1.0
+	freq_dict = {}
+
+	#creates a dictionary that counts how many times each letter appears in the 'input' text
+	for letter in input:
+		if letter in freq_dict:
+			freq_dict[letter] +=1
+		else:
+			freq_dict[letter] = 1
+
+	for item in freq_dict:
+		freq_dict[item] = freq_dict[item] / input_length
+
+	#print freq_dict
+
+	n = len(freq_dict) * 1.0	
+	return variance(freq_dict, n)
+
+
+
+def part_d_yz(encrypted_text):
+	length_encrypt = len(encrypted_text)
+	key_string = ''
+	e_index = 0
+	key_index = 0
+	key_length = 2
+	key_cipher = 'yz'
+
+	#extends the key so that it is the same length as the encrypted text
+	while e_index < length_encrypt:
+		for item in encrypted_text:
+			if key_index >= key_length:
+				key_index = 0
+			#print key_index
+			key_string += key_cipher[key_index]
+			key_index += 1
+			e_index += 1
+			if e_index >= length_encrypt:
+				continue
+
+	sum1 = 0
+	sum2 = 0
+
+	stringy = ''
+	stringz = ''
+	index = 0
+
+	while index < len(encrypted_text):
+		if key_string[index] == 'y':
+			stringy += encrypted_text[index]
+		else:
+			stringz += encrypted_text[index]
+		index += 1
+
+	length_y = len(stringy) * 1.0
+	freq_dict_y = {}
+	for letter in stringy:
+		if letter in freq_dict_y:
+			freq_dict_y[letter] +=1
+		else:
+			freq_dict_y[letter] = 1
+
+	for item in freq_dict_y:
+		freq_dict_y[item] = freq_dict_y[item] / length_y
+
+	n_y = len(freq_dict_y) * 1.0	
+	variance_y = variance(freq_dict_y, n_y)
+
+	length_z = len(stringz) * 1.0
+	freq_dict_z = {}
+	for letter in stringz:
+		if letter in freq_dict_z:
+			freq_dict_z[letter] +=1
+		else:
+			freq_dict_z[letter] = 1
+
+	for item in freq_dict_z:
+		freq_dict_z[item] = freq_dict_z[item] / length_z
+
+	n_z = len(freq_dict_z) * 1.0	
+	variance_z = variance(freq_dict_z, n_z)
+
+	mean_variance = (variance_z + variance_y) / 2
+
+
+
+	print mean_variance
+	#print stringz
+
+def part_d_xyz(encrypted_text):
+	length_encrypt = len(encrypted_text)
+	key_string = ''
+	e_index = 0
+	key_index = 0
+	key_length = 3
+	key_cipher = 'xyz'
+
+	#extends the key so that it is the same length as the encrypted text
+	while e_index < length_encrypt:
+		for item in encrypted_text:
+			if key_index >= key_length:
+				key_index = 0
+			#print key_index
+			key_string += key_cipher[key_index]
+			key_index += 1
+			e_index += 1
+			if e_index >= length_encrypt:
+				continue
+
+	sum1 = 0
+	sum2 = 0
+	sum3 = 0
+
+	stringx = ''
+	stringy = ''
+	stringz = ''
+	index = 0
+
+	while index < len(encrypted_text):
+		if key_string[index] == 'x':
+			stringx += encrypted_text[index]
+		elif key_string[index] == 'y':
+			stringy += encrypted_text[index]
+		else: 
+			stringz += encrypted_text[index]
+		index += 1
+
+	length_x = len(stringx) * 1.0
+	freq_dict_x = {}
+	for letter in stringx:
+		if letter in freq_dict_x:
+			freq_dict_x[letter] +=1
+		else:
+			freq_dict_x[letter] = 1
+
+	for item in freq_dict_x:
+		freq_dict_x[item] = freq_dict_x[item] / length_x
+
+	n_x = len(freq_dict_x) * 1.0	
+	variance_x = variance(freq_dict_x, n_x)
+
+	length_y = len(stringy) * 1.0
+	freq_dict_y = {}
+	for letter in stringy:
+		if letter in freq_dict_y:
+			freq_dict_y[letter] +=1
+		else:
+			freq_dict_y[letter] = 1
+
+	for item in freq_dict_y:
+		freq_dict_y[item] = freq_dict_y[item] / length_y
+
+	n_y = len(freq_dict_y) * 1.0	
+	variance_y = variance(freq_dict_y, n_y)
+
+	length_z = len(stringz) * 1.0
+	freq_dict_z = {}
+	for letter in stringz:
+		if letter in freq_dict_z:
+			freq_dict_z[letter] +=1
+		else:
+			freq_dict_z[letter] = 1
+
+	for item in freq_dict_z:
+		freq_dict_z[item] = freq_dict_z[item] / length_z
+
+	n_z = len(freq_dict_z) * 1.0	
+	variance_z = variance(freq_dict_z, n_z)
+
+	mean_variance = (variance_x + variance_z + variance_y) / 3
+
+	print mean_variance
+
+def part_d_wxyz(encrypted_text):
+	length_encrypt = len(encrypted_text)
+	key_string = ''
+	e_index = 0
+	key_index = 0
+	key_length = 4
+	key_cipher = 'wxyz'
+
+	#extends the key so that it is the same length as the encrypted text
+	while e_index < length_encrypt:
+		for item in encrypted_text:
+			if key_index >= key_length:
+				key_index = 0
+			#print key_index
+			key_string += key_cipher[key_index]
+			key_index += 1
+			e_index += 1
+			if e_index >= length_encrypt:
+				continue
+
+	sum1 = 0
+	sum2 = 0
+	sum3 = 0
+	sum4 = 0
+
+	stringw = ''
+	stringx = ''
+	stringy = ''
+	stringz = ''
+	index = 0
+
+	while index < len(encrypted_text):
+		if key_string[index] == 'w':
+			stringw += encrypted_text[index]
+		elif key_string[index] == 'x':
+			stringx += encrypted_text[index]
+		elif key_string[index] == 'y':
+			stringy += encrypted_text[index]
+		else: 
+			stringz += encrypted_text[index]
+		index += 1
+
+	length_w = len(stringw) * 1.0
+	freq_dict_w = {}
+	for letter in stringw:
+		if letter in freq_dict_w:
+			freq_dict_w[letter] +=1
+		else:
+			freq_dict_w[letter] = 1
+
+	for item in freq_dict_w:
+		freq_dict_w[item] = freq_dict_w[item] / length_w
+
+	n_w = len(freq_dict_w) * 1.0	
+	variance_w = variance(freq_dict_w, n_w)
+
+
+	length_x = len(stringx) * 1.0
+	freq_dict_x = {}
+	for letter in stringx:
+		if letter in freq_dict_x:
+			freq_dict_x[letter] +=1
+		else:
+			freq_dict_x[letter] = 1
+
+	for item in freq_dict_x:
+		freq_dict_x[item] = freq_dict_x[item] / length_x
+
+	n_x = len(freq_dict_x) * 1.0	
+	variance_x = variance(freq_dict_x, n_x)
+
+	length_y = len(stringy) * 1.0
+	freq_dict_y = {}
+	for letter in stringy:
+		if letter in freq_dict_y:
+			freq_dict_y[letter] +=1
+		else:
+			freq_dict_y[letter] = 1
+
+	for item in freq_dict_y:
+		freq_dict_y[item] = freq_dict_y[item] / length_y
+
+	n_y = len(freq_dict_y) * 1.0	
+	variance_y = variance(freq_dict_y, n_y)
+
+	length_z = len(stringz) * 1.0
+	freq_dict_z = {}
+	for letter in stringz:
+		if letter in freq_dict_z:
+			freq_dict_z[letter] +=1
+		else:
+			freq_dict_z[letter] = 1
+
+	for item in freq_dict_z:
+		freq_dict_z[item] = freq_dict_z[item] / length_z
+
+	n_z = len(freq_dict_z) * 1.0	
+	variance_z = variance(freq_dict_z, n_z)
+
+	mean_variance = (variance_w + variance_x + variance_z + variance_y) / 4
+
+	print mean_variance
+
+def part_d_vwxyz(encrypted_text):
+	length_encrypt = len(encrypted_text)
+	key_string = ''
+	e_index = 0
+	key_index = 0
+	key_length = 5
+	key_cipher = 'vwxyz'
+
+	#extends the key so that it is the same length as the encrypted text
+	while e_index < length_encrypt:
+		for item in encrypted_text:
+			if key_index >= key_length:
+				key_index = 0
+			#print key_index
+			key_string += key_cipher[key_index]
+			key_index += 1
+			e_index += 1
+			if e_index >= length_encrypt:
+				continue
+
+	sum1 = 0
+	sum2 = 0
+	sum3 = 0
+	sum4 = 0
+	sum5 = 0
+
+	stringv = ''
+	stringw = ''
+	stringx = ''
+	stringy = ''
+	stringz = ''
+	index = 0
+
+	while index < len(encrypted_text):
+		if key_string[index] == 'v':
+			stringv += encrypted_text[index]
+		elif key_string[index] == 'w':
+			stringw += encrypted_text[index]
+		elif key_string[index] == 'x':
+			stringx += encrypted_text[index]
+		elif key_string[index] == 'y':
+			stringy += encrypted_text[index]
+		else: 
+			stringz += encrypted_text[index]
+		index += 1
+
+
+	length_v = len(stringv) * 1.0
+	freq_dict_v = {}
+	for letter in stringv:
+		if letter in freq_dict_v:
+			freq_dict_v[letter] +=1
+		else:
+			freq_dict_v[letter] = 1
+
+	for item in freq_dict_v:
+		freq_dict_v[item] = freq_dict_v[item] / length_v
+
+	n_v = len(freq_dict_v) * 1.0	
+	variance_v = variance(freq_dict_v, n_v)
+
+
+	length_w = len(stringw) * 1.0
+	freq_dict_w = {}
+	for letter in stringw:
+		if letter in freq_dict_w:
+			freq_dict_w[letter] +=1
+		else:
+			freq_dict_w[letter] = 1
+
+	for item in freq_dict_w:
+		freq_dict_w[item] = freq_dict_w[item] / length_w
+
+	n_w = len(freq_dict_w) * 1.0	
+	variance_w = variance(freq_dict_w, n_w)
+
+
+	length_x = len(stringx) * 1.0
+	freq_dict_x = {}
+	for letter in stringx:
+		if letter in freq_dict_x:
+			freq_dict_x[letter] +=1
+		else:
+			freq_dict_x[letter] = 1
+
+	for item in freq_dict_x:
+		freq_dict_x[item] = freq_dict_x[item] / length_x
+
+	n_x = len(freq_dict_x) * 1.0	
+	variance_x = variance(freq_dict_x, n_x)
+
+	length_y = len(stringy) * 1.0
+	freq_dict_y = {}
+	for letter in stringy:
+		if letter in freq_dict_y:
+			freq_dict_y[letter] +=1
+		else:
+			freq_dict_y[letter] = 1
+
+	for item in freq_dict_y:
+		freq_dict_y[item] = freq_dict_y[item] / length_y
+
+	n_y = len(freq_dict_y) * 1.0	
+	variance_y = variance(freq_dict_y, n_y)
+
+	length_z = len(stringz) * 1.0
+	freq_dict_z = {}
+	for letter in stringz:
+		if letter in freq_dict_z:
+			freq_dict_z[letter] +=1
+		else:
+			freq_dict_z[letter] = 1
+
+	for item in freq_dict_z:
+		freq_dict_z[item] = freq_dict_z[item] / length_z
+
+	n_z = len(freq_dict_z) * 1.0	
+	variance_z = variance(freq_dict_z, n_z)
+
+	mean_variance = (variance_v + variance_w + variance_x + variance_z + variance_y) / 5
+
+	print mean_variance
+
+
+def part_d_uvwxyz(encrypted_text):
+	length_encrypt = len(encrypted_text)
+	key_string = ''
+	e_index = 0
+	key_index = 0
+	key_length = 6
+	key_cipher = 'uvwxyz'
+
+	#extends the key so that it is the same length as the encrypted text
+	while e_index < length_encrypt:
+		for item in encrypted_text:
+			if key_index >= key_length:
+				key_index = 0
+			#print key_index
+			key_string += key_cipher[key_index]
+			key_index += 1
+			e_index += 1
+			if e_index >= length_encrypt:
+				continue
+
+	sum1 = 0
+	sum2 = 0
+	sum3 = 0
+	sum4 = 0
+	sum5 = 0
+	sum6 = 0
+
+	stringu = ''
+	stringv = ''
+	stringw = ''
+	stringx = ''
+	stringy = ''
+	stringz = ''
+	index = 0
+
+	while index < len(encrypted_text):
+		if key_string[index] == 'u':
+			stringu += encrypted_text[index]
+		elif key_string[index] == 'v':
+			stringv += encrypted_text[index]
+		elif key_string[index] == 'w':
+			stringw += encrypted_text[index]
+		elif key_string[index] == 'x':
+			stringx += encrypted_text[index]
+		elif key_string[index] == 'y':
+			stringy += encrypted_text[index]
+		else: 
+			stringz += encrypted_text[index]
+		index += 1
+
+	
+	length_u = len(stringu) * 1.0
+	freq_dict_u = {}
+	for letter in stringu:
+		if letter in freq_dict_u:
+			freq_dict_u[letter] +=1
+		else:
+			freq_dict_u[letter] = 1
+
+	for item in freq_dict_u:
+		freq_dict_u[item] = freq_dict_u[item] / length_u
+
+	n_u = len(freq_dict_u) * 1.0	
+	variance_u = variance(freq_dict_u, n_u)
+
+
+	length_v = len(stringv) * 1.0
+	freq_dict_v = {}
+	for letter in stringv:
+		if letter in freq_dict_v:
+			freq_dict_v[letter] +=1
+		else:
+			freq_dict_v[letter] = 1
+
+	for item in freq_dict_v:
+		freq_dict_v[item] = freq_dict_v[item] / length_v
+
+	n_v = len(freq_dict_v) * 1.0	
+	variance_v = variance(freq_dict_v, n_v)
+
+
+	length_w = len(stringw) * 1.0
+	freq_dict_w = {}
+	for letter in stringw:
+		if letter in freq_dict_w:
+			freq_dict_w[letter] +=1
+		else:
+			freq_dict_w[letter] = 1
+
+	for item in freq_dict_w:
+		freq_dict_w[item] = freq_dict_w[item] / length_w
+
+	n_w = len(freq_dict_w) * 1.0	
+	variance_w = variance(freq_dict_w, n_w)
+
+
+	length_x = len(stringx) * 1.0
+	freq_dict_x = {}
+	for letter in stringx:
+		if letter in freq_dict_x:
+			freq_dict_x[letter] +=1
+		else:
+			freq_dict_x[letter] = 1
+
+	for item in freq_dict_x:
+		freq_dict_x[item] = freq_dict_x[item] / length_x
+
+	n_x = len(freq_dict_x) * 1.0	
+	variance_x = variance(freq_dict_x, n_x)
+
+	length_y = len(stringy) * 1.0
+	freq_dict_y = {}
+	for letter in stringy:
+		if letter in freq_dict_y:
+			freq_dict_y[letter] +=1
+		else:
+			freq_dict_y[letter] = 1
+
+	for item in freq_dict_y:
+		freq_dict_y[item] = freq_dict_y[item] / length_y
+
+	n_y = len(freq_dict_y) * 1.0	
+	variance_y = variance(freq_dict_y, n_y)
+
+	length_z = len(stringz) * 1.0
+	freq_dict_z = {}
+	for letter in stringz:
+		if letter in freq_dict_z:
+			freq_dict_z[letter] +=1
+		else:
+			freq_dict_z[letter] = 1
+
+	for item in freq_dict_z:
+		freq_dict_z[item] = freq_dict_z[item] / length_z
+
+	n_z = len(freq_dict_z) * 1.0	
+	variance_z = variance(freq_dict_z, n_z)
+
+	mean_variance = (variance_u + variance_v + variance_w + variance_x + variance_z + variance_y) / 6
+
+	print mean_variance
+
+def part_d_tuvwxyz(encrypted_text):
+	length_encrypt = len(encrypted_text)
+	key_string = ''
+	e_index = 0
+	key_index = 0
+	key_length = 7
+	key_cipher = 'tuvwxyz'
+
+	#extends the key so that it is the same length as the encrypted text
+	while e_index < length_encrypt:
+		for item in encrypted_text:
+			if key_index >= key_length:
+				key_index = 0
+			#print key_index
+			key_string += key_cipher[key_index]
+			key_index += 1
+			e_index += 1
+			if e_index >= length_encrypt:
+				continue
+
+	sum1 = 0
+	sum2 = 0
+	sum3 = 0
+	sum4 = 0
+	sum5 = 0
+	sum6 = 0
+
+	stringt = ''
+	stringu = ''
+	stringv = ''
+	stringw = ''
+	stringx = ''
+	stringy = ''
+	stringz = ''
+	index = 0
+
+	while index < len(encrypted_text):
+		if key_string[index] == 't':
+			stringt += encrypted_text[index]
+		elif key_string[index] == 'u':
+			stringu += encrypted_text[index]
+		elif key_string[index] == 'v':
+			stringv += encrypted_text[index]
+		elif key_string[index] == 'w':
+			stringw += encrypted_text[index]
+		elif key_string[index] == 'x':
+			stringx += encrypted_text[index]
+		elif key_string[index] == 'y':
+			stringy += encrypted_text[index]
+		else: 
+			stringz += encrypted_text[index]
+		index += 1
+
+	length_t = len(stringt) * 1.0
+	freq_dict_t = {}
+	for letter in stringt:
+		if letter in freq_dict_t:
+			freq_dict_t[letter] +=1
+		else:
+			freq_dict_t[letter] = 1
+
+	for item in freq_dict_t:
+		freq_dict_t[item] = freq_dict_t[item] / length_t
+
+	n_t = len(freq_dict_t) * 1.0	
+	variance_t = variance(freq_dict_t, n_t)
+
+	length_u = len(stringu) * 1.0
+	freq_dict_u = {}
+	for letter in stringu:
+		if letter in freq_dict_u:
+			freq_dict_u[letter] +=1
+		else:
+			freq_dict_u[letter] = 1
+
+	for item in freq_dict_u:
+		freq_dict_u[item] = freq_dict_u[item] / length_u
+
+	n_u = len(freq_dict_u) * 1.0	
+	variance_u = variance(freq_dict_u, n_u)
+
+
+	length_v = len(stringv) * 1.0
+	freq_dict_v = {}
+	for letter in stringv:
+		if letter in freq_dict_v:
+			freq_dict_v[letter] +=1
+		else:
+			freq_dict_v[letter] = 1
+
+	for item in freq_dict_v:
+		freq_dict_v[item] = freq_dict_v[item] / length_v
+
+	n_v = len(freq_dict_v) * 1.0	
+	variance_v = variance(freq_dict_v, n_v)
+
+
+	length_w = len(stringw) * 1.0
+	freq_dict_w = {}
+	for letter in stringw:
+		if letter in freq_dict_w:
+			freq_dict_w[letter] +=1
+		else:
+			freq_dict_w[letter] = 1
+
+	for item in freq_dict_w:
+		freq_dict_w[item] = freq_dict_w[item] / length_w
+
+	n_w = len(freq_dict_w) * 1.0	
+	variance_w = variance(freq_dict_w, n_w)
+
+
+	length_x = len(stringx) * 1.0
+	freq_dict_x = {}
+	for letter in stringx:
+		if letter in freq_dict_x:
+			freq_dict_x[letter] +=1
+		else:
+			freq_dict_x[letter] = 1
+
+	for item in freq_dict_x:
+		freq_dict_x[item] = freq_dict_x[item] / length_x
+
+	n_x = len(freq_dict_x) * 1.0	
+	variance_x = variance(freq_dict_x, n_x)
+
+	length_y = len(stringy) * 1.0
+	freq_dict_y = {}
+	for letter in stringy:
+		if letter in freq_dict_y:
+			freq_dict_y[letter] +=1
+		else:
+			freq_dict_y[letter] = 1
+
+	for item in freq_dict_y:
+		freq_dict_y[item] = freq_dict_y[item] / length_y
+
+	n_y = len(freq_dict_y) * 1.0	
+	variance_y = variance(freq_dict_y, n_y)
+
+	length_z = len(stringz) * 1.0
+	freq_dict_z = {}
+	for letter in stringz:
+		if letter in freq_dict_z:
+			freq_dict_z[letter] +=1
+		else:
+			freq_dict_z[letter] = 1
+
+	for item in freq_dict_z:
+		freq_dict_z[item] = freq_dict_z[item] / length_z
+
+	n_z = len(freq_dict_z) * 1.0	
+	variance_z = variance(freq_dict_z, n_z)
+
+	mean_variance = (variance_t + variance_u + variance_v + variance_w + variance_x + variance_z + variance_y) / 7
+
+	print mean_variance
+
+def split_into_caesars(input):
+
+	# This splits the ciphertext into 7 different Caesar ciphers (the key lenght is 7)
+	string0 = input[0::7]
+	string1 = input[1::7]
+	string2 = input[2::7]
+	string3 = input[3::7]
+	string4 = input[4::7]
+	string5 = input[5::7]
+	string6 = input[6::7]
+
+
+	# I created relative frequency dictionaries of the 7 caesar ciphertexts to do a frequency analysis
+	# with the normal Englsih dictionary. I plan to see which letter has a frequency closest to e from the normal
+	# English dictionary, and use that to figure out how much I should shift the letters in each string backwards.
+	string0_length = len(string0) * 1.0
+	freq_dict0 = {}
+	for letter in string0:
+		if letter in freq_dict0:
+			freq_dict0[letter] +=1
+		else:
+			freq_dict0[letter] = 1
+
+	for item in freq_dict0:
+		freq_dict0[item] = freq_dict0[item] / string0_length
+
+	string1_length = len(string1) * 1.0
+	freq_dict1 = {}
+	for letter in string1:
+		if letter in freq_dict1:
+			freq_dict1[letter] +=1
+		else:
+			freq_dict1[letter] = 1
+
+	for item in freq_dict1:
+		freq_dict1[item] = freq_dict1[item] / string1_length
+
+	string2_length = len(string2) * 1.0
+	freq_dict2 = {}
+	for letter in string2:
+		if letter in freq_dict2:
+			freq_dict2[letter] +=1
+		else:
+			freq_dict2[letter] = 1
+
+	for item in freq_dict2:
+		freq_dict2[item] = freq_dict2[item] / string2_length
+
+
+	string3_length = len(string3) * 1.0
+	freq_dict3 = {}
+	for letter in string3:
+		if letter in freq_dict3:
+			freq_dict3[letter] +=1
+		else:
+			freq_dict3[letter] = 1
+
+	for item in freq_dict3:
+		freq_dict3[item] = freq_dict3[item] / string3_length
+
+
+	string4_length = len(string4) * 1.0
+	freq_dict4 = {}
+	for letter in string4:
+		if letter in freq_dict4:
+			freq_dict4[letter] +=1
+		else:
+			freq_dict4[letter] = 1
+
+	for item in freq_dict4:
+		freq_dict4[item] = freq_dict4[item] / string4_length
+
+	
+	string5_length = len(string5) * 1.0
+	freq_dict5 = {}
+	for letter in string5:
+		if letter in freq_dict5:
+			freq_dict5[letter] +=1
+		else:
+			freq_dict5[letter] = 1
+
+	for item in freq_dict5:
+		freq_dict5[item] = freq_dict5[item] / string5_length
+
+
+	string6_length = len(string6) * 1.0
+	freq_dict6 = {}
+	for letter in string6:
+		if letter in freq_dict6:
+			freq_dict6[letter] +=1
+		else:
+			freq_dict6[letter] = 1
+
+	for item in freq_dict6:
+		freq_dict6[item] = freq_dict6[item] / string6_length
+
+
+	string0_index = 0
+	string1_index = 0
+	string2_index = 0
+	string3_index = 0
+	string4_index = 0
+	string5_index = 0
+	stiring6_index = 0
+	decrypted0 = ''
+	decrypted1 = ''
+	decrypted2 = ''
+	decrypted3 = ''
+	decrypted4 = ''
+	decrypted5 = ''
+	decrypted6 = ''
+
+	# letter i had closest frequency to e in string0, so shifted this Caesar cipher 4 back
+	# this decrypts each individual Caesar cipher
+	while string0_index < len(string0):
+		index = (vigenere_dict[string0[string0_index]] - 4) % 26
+		decrypted0 += vigenere_opp[index]
+		string0_index += 1
+
+	while string1_index < len(string1):
+		index = (vigenere_dict[string1[string1_index]] - 23) % 26
+		decrypted1 += vigenere_opp[index]
+		string1_index += 1
+
+	while string3_index < len(string3):
+		index = (vigenere_dict[string3[string3_index]] - 11) % 26
+		decrypted3 += vigenere_opp[index]
+		string3_index += 1
+
+	while string4_index < len(string4):
+		index = (vigenere_dict[string4[string4_index]] - 19) % 26
+		decrypted4 += vigenere_opp[index]
+		string4_index += 1
+
+	while string5_index < len(string5):
+		index = (vigenere_dict[string5[string5_index]] - 4) % 26
+		decrypted5 += vigenere_opp[index]
+		string5_index += 1
+
+	while string6_index < len(string6):
+		index = (vigenere_dict[string6[string6_index]] - 3) % 26
+		decrypted6 += vigenere_opp[index]
+		string6_index += 1
+
+	'''print freq_dict0
+	print string0
+	print '****************************'
+	print decrypted0'''
+
+	'''print freq_dict1
+	print string1
+	print '****************************'
+	print decrypted1'''
+	
+	'''print freq_dict2
+	print string2
+	print '****************************'
+	print decrypted2'''
+
+	'''print freq_dict3
+	print string3
+	print '****************************'
+	'''
+
+	'''print freq_dict4
+	print string4
+	print '****************************'
+	'''
+
+	'''print freq_dict5
+	print string5
+	print '****************************'
+	'''
+
+	'''print freq_dict6
+	print string6'''
+
+
+
+#I used this to figure out the length of my key
+'''part_d_yz(ciphertext)
+part_d_xyz(ciphertext)
+part_d_wxyz(ciphertext)
+part_d_vwxyz(ciphertext)
+part_d_uvwxyz(ciphertext)
+part_d_tuvwxyz(ciphertext)''' #Key is 7 characters long, because the mean variance for this one is ~0.001
+

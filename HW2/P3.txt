@@ -1,0 +1,3 @@
+#Problem 3
+
+Snakeoil cryptography is a cryptographic method that is not actually secure (Wikipedia). It relates to Problem 2, because we were able to decrypt the Vigenere ciphered text fairly easily. All we had to do was separate it into separate Caesar ciphers, then use frequency analysis to see how much each Caesar cipher was shifted over to decrypt the original message.
