@@ -79,15 +79,38 @@ except:
 ##		to search for is. 
 
 #use online json viewer
+def get_twitter_data():
+	search_term = input("Enter Tweet term: ")
+	word = "twitter_{}".format(search_term)
+
+	if word in CACHE_DICTION:
+		tweets = CACHE_DICTION[word]
+	else: 
+		results = api.search(q = search_term, count = 5)
+		tweets = results["statuses"]
+		CACHE_DICTION[word] = tweets
+		f = open(CACHE_FNAME, "w")
+		f.write(json.dumps(CACHE_DICTION))
+		f.close
+
+	tweet_results = list()
+	for tweet in tweets:
+		tweet_results.append("TEXT: " + tweet["text"])
+		tweet_results.append("CREATED AT :" + tweet["created_at"] + "\n")
+
+	return tweet_results
+
+	
 
 
 ## 3. Using a loop, invoke your function, save the return value in a variable, and explore the 
 ##		data you got back!
 
+for x in range(3):
+	data = get_twitter_data()
+	for item in data:
+		print (item)
 
-## 4. With what you learn from the data -- e.g. how exactly to find the 
-##		text of each tweet in the big nested structure -- write code to print out 
-## 		content from 5 tweets, as shown in the linked example.
 
 
 
