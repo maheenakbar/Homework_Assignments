@@ -83,20 +83,26 @@ def get_twitter_data():
 	search_term = input("Enter Tweet term: ")
 	word = "twitter_{}".format(search_term)
 
+
 	if word in CACHE_DICTION:
+		print ("using cache")
 		tweets = CACHE_DICTION[word]
 	else: 
+		print ("fetching")
+		#api search of the word in the last 5 tweets
 		results = api.search(q = search_term, count = 5)
 		tweets = results["statuses"]
 		CACHE_DICTION[word] = tweets
 		f = open(CACHE_FNAME, "w")
+		#updates the json file with whatever is in CACHE_DICTION
 		f.write(json.dumps(CACHE_DICTION))
 		f.close
 
 	tweet_results = list()
+	#creates the list that has the tweet information
 	for tweet in tweets:
 		tweet_results.append("TEXT: " + tweet["text"])
-		tweet_results.append("CREATED AT :" + tweet["created_at"] + "\n")
+		tweet_results.append("CREATED AT: " + tweet["created_at"] + "\n")
 
 	return tweet_results
 
@@ -106,6 +112,7 @@ def get_twitter_data():
 ## 3. Using a loop, invoke your function, save the return value in a variable, and explore the 
 ##		data you got back!
 
+#loops three times to search for 3 different words
 for x in range(3):
 	data = get_twitter_data()
 	for item in data:
