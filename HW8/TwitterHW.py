@@ -68,6 +68,8 @@ cur = conn.cursor()
 
 # 2 - Write code to drop the Tweets table if it exists, and create the table (so you can run the program over and over), with the correct (4) column names and appropriate types for each.
 # HINT: Remember that the time_posted column should be the TIMESTAMP data type!
+
+#checks to see if table Tweets already exists
 cur.execute('DROP TABLE IF EXISTS Tweets')
 cur.execute('CREATE TABLE Tweets (tweet_id TEXT, author TEXT, time_posted TIMESTAMP, tweet_text TEXT, retweets NUMBER)')
 
@@ -79,6 +81,7 @@ umsi_tweets = get_tweets()
 #for tweet in umsi_tweets:
 #	print (tweet)
 
+#inserts the specified information into the Tweets table
 for tweet in umsi_tweets:
 	tup = tweet['id'], tweet['user']['screen_name'], tweet['created_at'], tweet['text'], tweet['retweet_count']
 	cur.execute('INSERT INTO Tweets (tweet_id, author, time_posted, tweet_text, retweets) VALUES (?, ?, ?, ?, ?)', tup)
